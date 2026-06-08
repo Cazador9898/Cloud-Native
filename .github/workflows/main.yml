@@ -16,11 +16,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Build JAR
         working-directory: ./EX1_S3_Guias_Transporte/EX1_S3_Guias_Transporte
-        run: |
-          chmod +x mvnw
-          ./mvnw clean package -DskipTests
+        run: mvn clean package -DskipTests
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -30,12 +34,10 @@ jobs:
 
       - name: Build Docker Image
         working-directory: ./EX1_S3_Guias_Transporte/EX1_S3_Guias_Transporte
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest .
 
       - name: Push Docker Image
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
